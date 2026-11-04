@@ -10,21 +10,31 @@ class GetData():
         for l in range(len(self.lines)): 
             self.lines[l] = self.lines[l].replace("\n", "")
 
-        self.capacity = 0 # capacity of the truck
-        self.dimension = 0 # dimension of the truck 
+        self.dimension = int(self.lines[0].replace("DIMENSION : ","")) # dimension of the truck   
+        self.capacity = int(self.lines[1].replace("CAPACITY : ","")) # capacity of the truck 
+
+        self.demand = [] # demand of the problem
         self.coordinates = [] # coordinates of the problem
 
-    def instances_data(self):
-        self.dimension = int(self.lines[0].replace("DIMENSION : ","")) # get the dimension 
-        self.capacity = int(self.lines[1].replace("CAPACITY : ","")) # get the capacity
         for line in range(3 ,len(self.lines)): # get the coordinates (skip the third useless line)
-            if self.lines[line] == "DEMAND_SECTION ":
+            if self.lines[line] == "DEMAND_SECTION ": # when it finds the demands section stops the loop
+                for demand in range(line + 1, len(self.lines)):
+                    values = [int(x) for x in self.lines[demand].split()]
+                    self.demand.append(values[1])
                 break
             else: 
                 values = [int(x) for x in self.lines[line].split()]
                 self.coordinates.append((values[1], values[2])) # coordinates of the points, starts from 0
 
-
-        return self.capacity, self.dimension, self.coordinates 
+    def get_capacity(self):
+        return self.capacity
     
+    def get_dimension(self):
+        return self.dimension
+    
+    def get_coordinates(self):
+        return self.coordinates
+    
+    def get_demand(self):
+        return self.demand
     
