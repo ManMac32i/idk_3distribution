@@ -1,2 +1,7 @@
 # extensions 
 .pdf
+.pyc
+
+
+# repositories
+__pycache__
