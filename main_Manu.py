@@ -1,5 +1,6 @@
 import os
 from  data_folder import *
+from solver import *
 
 filename = "01.txt"
 foldername = "instances"
