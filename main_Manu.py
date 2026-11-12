@@ -1,5 +1,5 @@
 import os
-from  data_getter import *
+from  data_folder.data_getter import *
 
 filename = "01.txt"
 foldername = "instances"
