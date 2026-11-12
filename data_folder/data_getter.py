@@ -1,7 +1,6 @@
 import json
 import numpy as np
 
-
 class GetData():
     def __init__(self, file_path: str):
         self.file_path = file_path

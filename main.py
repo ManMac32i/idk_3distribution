@@ -1,5 +1,5 @@
 import os
-from  data_folder import *
+from data_folder import *
 
 
 filename = "01.txt"
