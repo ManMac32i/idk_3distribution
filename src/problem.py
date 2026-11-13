@@ -1,6 +1,6 @@
-from client import Client
-from helpers.data_getter import get_data
-from helpers.configuration import CAPACITIES
+from .client import Client
+from .helpers.data_getter import get_data
+from .helpers.configuration import CAPACITIES
 
 class Problem:
     def __init__(self, instance):
