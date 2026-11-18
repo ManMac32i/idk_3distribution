@@ -1,4 +1,5 @@
 from src import *
+import gurobipy as gp
 
 filename = "01.txt"
 foldername = "instances"
