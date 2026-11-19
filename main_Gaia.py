@@ -3,7 +3,7 @@ import time
 import pandas as pd
 
 from src import Problem1, Problem2
-from src.helpers import EMISIONS, VEHICLE_WEIGHTS
+from src.helpers import EMISIONS, VEHICLE_WEIGHTS, RESULTS_FOLDERS
 
 def pipeline_gurobi_scenario1_comparison(gurobi_time_limit):
     instances_solved = []
@@ -68,11 +68,13 @@ def pipeline_gurobi_scenario1_comparison(gurobi_time_limit):
 
 if __name__ == '__main__':
     instances = [13]
+    test_mode = True # Set to True to save results in the "tests" folder, False to save in the "results" folder
+    results_dir = RESULTS_FOLDERS["local"] if test_mode else RESULTS_FOLDERS["shared"]
     for instance in instances:
         p2 = Problem2(instance=instance,
                     truck_routing_emissions=EMISIONS["truck"],
                     empty_truck_weight=VEHICLE_WEIGHTS["truck"])
         
-        p2.solve_gurobi(time_limit=60)
+        p2.solve_gurobi(time_limit=60, test_mode=test_mode)
         p2.plot_trips_scenario2(solution_method="Gurobi",
-                                csv_path=f'results/scenario2/gurobi_instance_{instance}.csv')
+                                csv_path=f'{results_dir}/scenario2/gurobi_instance_{instance}.csv')

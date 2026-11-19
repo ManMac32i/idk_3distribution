@@ -34,3 +34,6 @@ VEHICLE_WEIGHTS = {
     "car": 2000,
     "bike": 20
     }
+
+RESULTS_FOLDERS = {"shared": "results",
+                   "local": "tests"}

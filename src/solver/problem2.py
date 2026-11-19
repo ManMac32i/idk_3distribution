@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 from collections import defaultdict
 
 from ..problem import Problem
-from ..helpers.configuration import EMISIONS
+from ..helpers.configuration import EMISIONS, RESULTS_FOLDERS
 
 class Problem2(Problem):
     def __init__(self,
@@ -28,7 +28,7 @@ class Problem2(Problem):
     def solve_gurobi(self,
                      time_limit=600,
                      verbose=False,
-                     results_dir='results/scenario2',
+                     test_mode=True,
                      results_fname_prefix='gurobi',
                      save_results=True):
             node_labels = list(range(len(self.clients) + 1))  # define node labels (depot is 0, clients are 1,...,n)
@@ -114,8 +114,12 @@ class Problem2(Problem):
                 }
 
             if save_results:
+                destination_folder = RESULTS_FOLDERS["local"] if test_mode else RESULTS_FOLDERS["shared"]
+                results_dir=f"{destination_folder}/scenario2"
+
                 if verbose:
                     print(f"Saving results to {results_dir}/{results_fname_prefix}_instance_{self.instance}.csv")
+                
                 os.makedirs(results_dir, exist_ok=True)
                 path = f"{results_dir}/{results_fname_prefix}_instance_{self.instance}.csv"
 
