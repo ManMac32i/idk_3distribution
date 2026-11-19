@@ -1,4 +1,4 @@
-from .configuration import EMISIONS
+from .configuration import EMISIONS, VEHICLE_WEIGHTS
 
 def get_co2(distance, demand, vehicle):
     # Transport emissions (g of CO2) of carrying `demand` kg over `distance` km.
@@ -11,4 +11,5 @@ def get_co2(distance, demand, vehicle):
         raise ValueError("distance and demand must be non-negative")
 
     tonnes = demand / 1000
-    return EMISIONS[vehicle] * tonnes * distance
+    vehicle_weight_tonnes = VEHICLE_WEIGHTS[vehicle] / 1000
+    return EMISIONS[vehicle] * (tonnes + vehicle_weight_tonnes) * distance

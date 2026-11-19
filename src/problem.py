@@ -4,6 +4,7 @@ from .helpers.configuration import CAPACITIES
 
 class Problem:
     def __init__(self, instance):
+        self.instance = instance
         dimension, capacity, demand, coordinates = get_data(instance)
 
         # point 0 of the file is the depot, the rest are clients
