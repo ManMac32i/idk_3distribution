@@ -68,6 +68,10 @@ DEMAND_SECTION
 4 600
 ```
 
+**Notes about optimality in scenario 3**
+
+- Instances **03** (31 points, clustered) and **05** (19 points): *"might be possible to find exact optimal solution for scenario 3"*, i.e. small enough to try an exact method for the 2-echelon scheme.
+
 ## Base-case assumptions
 
 These assumptions define the **base-case scenario** and must be reported as such.
