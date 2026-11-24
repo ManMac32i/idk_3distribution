@@ -8,3 +8,6 @@ __pycache__/
 
 # local results (not shared)
 local_results/
+
+# MAC files:
+.DS_Store

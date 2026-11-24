@@ -36,7 +36,7 @@ VEHICLE_WEIGHTS = {
     }
 
 RESULTS_FOLDERS = {"shared": "results",
-                   "local": "tests"}
+                   "local": "local_results"}
 
 # map units: instance coordinates are in hectometres (1 unit = 100 m)
 HM_PER_KM = 10
