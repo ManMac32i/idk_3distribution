@@ -1,9 +1,10 @@
-# extensions 
+# extensions
 .pdf
-.pyc
+*.pyc
 .vscode
 
+# python cache
+__pycache__/
 
-
-# repositories
-__pycache__
+# local results (not shared)
+local_results/

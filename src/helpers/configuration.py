@@ -26,3 +26,17 @@ BUILDING_EMISIONS = {
     "bike": 96000,
     "fridge": 257000
 }
+
+# vehicle weights in kg 
+# Todo: check values!!
+VEHICLE_WEIGHTS = {
+    "truck": 10000,
+    "car": 2000,
+    "bike": 20
+    }
+
+RESULTS_FOLDERS = {"shared": "results",
+                   "local": "tests"}
+
+# map units: instance coordinates are in hectometres (1 unit = 100 m)
+HM_PER_KM = 10
