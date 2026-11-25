@@ -32,6 +32,7 @@ class Problem2(Problem):
 
     def solve_gurobi(self,
                      time_limit=600,
+                     gap_limit = 0.01,
                      verbose=False,
                      test_mode=True,
                      results_fname_prefix='gurobi',
@@ -103,6 +104,7 @@ class Problem2(Problem):
             ######## Specify solver parameters if needed #########
 
             m.Params.TimeLimit = time_limit        # seconds
+            m.Params.MIPGap = gap_limit            # 1 %
 
             if not verbose:
                 m.Params.OutputFlag = 0
