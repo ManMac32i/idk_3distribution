@@ -1,5 +1,5 @@
 from src import Problem1, Problem2
-from src.helpers import EMISIONS, VEHICLE_WEIGHTS, RESULTS_FOLDERS
+from src.helpers import RESULTS_FOLDERS
 
 
 if __name__ == '__main__':
@@ -12,9 +12,7 @@ if __name__ == '__main__':
     test_mode = True # Set to True to save results in the "local_results" folder, False to save in the "results" folder
     results_dir = RESULTS_FOLDERS["local"] if test_mode else RESULTS_FOLDERS["shared"]
     for instance in instances:
-        p2 = Problem2(instance=instance,
-                    truck_routing_emissions=EMISIONS["truck"],
-                    empty_truck_weight=VEHICLE_WEIGHTS["truck"])
+        p2 = Problem2(instance=instance)
 
         p2.solve_gurobi(time_limit=60,
                         test_mode=test_mode)

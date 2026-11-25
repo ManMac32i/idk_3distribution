@@ -7,16 +7,20 @@ import plotly.graph_objects as go
 from collections import defaultdict
 
 from ..problem import Problem
-from ..helpers.configuration import EMISIONS, RESULTS_FOLDERS
+from ..helpers.configuration import RESULTS_FOLDERS
+from ..helpers.co2_calculation import get_co2
 
 class Problem2(Problem):
-    def __init__(self,
-                 instance,
-                 truck_routing_emissions,
-                 empty_truck_weight):
+    """
+        Scenario 2 (Routing, 1-to-all CVRP): a fleet of trucks delivers the goods from the depot to the clients.
+        - truck capacity = CAPACITY of the instance file (not CAPACITIES["truck"] = 21 t of the base case)
+        - CO2 of each arc computed with get_co2 (same formula as scenario 1):
+          load carried on the arc + empty truck weight (if include_tare)
+    """
+
+    def __init__(self, instance, include_tare=True):
         super().__init__(instance)
-        self.truck_routing_emissions = truck_routing_emissions # g of CO2 per tonne per km
-        self.empty_truck_weight = empty_truck_weight / 1000 # convert to tonnes
+        self.include_tare = include_tare
 
     def compute_distance_matrix(self):
         # distance matrix (km) between depot (0) and clients (1..n)
@@ -33,10 +37,19 @@ class Problem2(Problem):
             client_labels = list(range(1, len(self.clients) + 1))  # define client labels (1,2,...,n)
             demands = [0] + [c.demand/1000 for c in self.clients]  # define demands in tonnes (0 for depot, positive for clients)
             distance_matrix = self.compute_distance_matrix()  # distance matrix (km)
+            capacity = self.capacity / 1000  # truck capacity in tonnes, from the instance file
+
+            # CO2 (g) of each arc, split in the two parts of get_co2:
+            # - load_emissions[i, j]: g of CO2 per tonne of goods carried on arc (i, j)
+            # - tare_emissions[i, j]: g of CO2 of driving the (empty) truck on arc (i, j), 0 if include_tare is False
+            load_emissions = {(i, j): get_co2(distance_matrix[i, j], 1000, "truck", include_tare=False)
+                         for i in node_labels for j in node_labels if i != j}
+            tare_emissions = {(i, j): get_co2(distance_matrix[i, j], 0, "truck", self.include_tare)
+                         for i in node_labels for j in node_labels if i != j}
 
             ######## Define model #########
 
-            m = gp.Model(f"FCVRP_{len(node_labels)}")   # 1. create a new model
+            m = gp.Model(f"FCVRP_{len(node_labels)}")
 
             ######## Define variables #########
 
@@ -45,9 +58,10 @@ class Problem2(Problem):
 
             ######## Define objective #########
 
-            m.setObjective(self.truck_routing_emissions * gp.quicksum(distance_matrix[i, j] * q[i, j] for i in node_labels for j in node_labels if i != j) + 
-                           self.truck_routing_emissions * gp.quicksum(distance_matrix[i, j] * self.empty_truck_weight * a[i, j] for i in node_labels for j in node_labels if i != j),
-                           GRB.MINIMIZE) # no emission factor included here, should be added later
+            # total g of CO2 = goods transported + empty truck weight on every arc used
+            m.setObjective(gp.quicksum(load_emissions[i, j] * q[i, j]
+                                       + tare_emissions[i, j] * a[i, j] for i, j in load_emissions),
+                           GRB.MINIMIZE)
 
             ######## Define constraints #########
 
@@ -57,7 +71,7 @@ class Problem2(Problem):
             m.addConstrs((a[i,i] == 0 for i in node_labels),
                          name="no_self_loops_a")
             
-            m.addConstrs((q[i,j] <= self.capacity / 1000 * a[i,j] for i in node_labels for j in node_labels if i != j),
+            m.addConstrs((q[i,j] <= capacity * a[i,j] for i in node_labels for j in node_labels if i != j),
                         name="quantity_arc_relation")
             
             m.addConstrs((gp.quicksum(a[i,j] for j in node_labels) == 1 for i in client_labels),
@@ -67,10 +81,11 @@ class Problem2(Problem):
                          name="depot_leaves_at_least_once")
 
             m.addConstrs((gp.quicksum(a[i,j] for j in node_labels) == gp.quicksum(a[j,i] for j in node_labels) for i in node_labels),
-                         name="flow_conservation")
+                         name="arc_flow_conservation")
 
+            # each client keeps exactly its demand: goods in - goods out >= demand (also eliminates subtours)
             m.addConstrs((gp.quicksum(q[j,i] for j in node_labels) - gp.quicksum(q[i,j] for j in node_labels) >= demands[i] for i in client_labels),
-                         name="flow_conservation")
+                         name="goods_flow_conservation")
 
             # Add optional constraints to speed up solving
 
@@ -79,7 +94,7 @@ class Problem2(Problem):
 
             ######## Specify solver parameters if needed #########
 
-            m.Params.TimeLimit = time_limit        # secondi massimi
+            m.Params.TimeLimit = time_limit        # seconds
 
             if not verbose:
                 m.Params.OutputFlag = 0
@@ -124,11 +139,11 @@ class Problem2(Problem):
                 meta = {
                     "instance":   self.instance,
                     "status":     m.Status,                       # 2 = OPTIMAL, 9 = TIME_LIMIT, 3 = INFEASIBLE
-                    "time_limit": m.Params.TimeLimit,             # parametro impostato
-                    "runtime":    round(m.Runtime, 2),            # tempo effettivo
-                    "obj_val":    round(m.ObjVal, 2) if result else None,
+                    "time_limit": m.Params.TimeLimit,             # preset parameter
+                    "runtime":    round(m.Runtime, 2),            # actual execution time
+                    "obj_val_g":    round(m.ObjVal, 2) if result else None,
                     "obj_bound":  round(m.ObjBound, 2) if result else None,
-                    "mip_gap":    round(m.MIPGap, 4) if result else None,  # gap ottenuto
+                    "mip_gap":    round(m.MIPGap, 4) if result else None,  # obtained optimality gap
                 }
 
                 with open(path, "w") as f:

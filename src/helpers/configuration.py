@@ -7,7 +7,7 @@ EMISIONS = {
 
 # vehicle capacities in kg
 CAPACITIES = {
-    "truck": 21000,
+    "truck": 21000,  # base case of the subject; NOT used: scenario 2 uses the CAPACITY of each instance file
     "car": 1500,
     "bike": 100
 }
