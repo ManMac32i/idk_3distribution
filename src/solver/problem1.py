@@ -12,9 +12,11 @@ class Problem1(Problem):
         - each round trip = outbound leg with the empty vehicle + return leg with the goods
     """
 
-    def __init__(self, instance, include_tare=True):
-        super().__init__(instance)
-        self.include_tare = include_tare
+    def __init__(self,
+                 instance,
+                 include_tare,
+                 include_build):
+        super().__init__(instance, include_tare, include_build)
 
     def calculate_co2(self):
         co2=0
@@ -22,7 +24,7 @@ class Problem1(Problem):
             distance = self.depot_distances_km[i+1]
             vehicle = "bike" if 2*distance <= BIKE_MAX_ROUND_TRIP and c.demand <= BIKE_MAX_DEMAND else "car"
             trips = ceil(c.demand / CAPACITIES[vehicle])
-            co2 += trips * get_co2_roundtrip(distance, c.demand / trips, vehicle, self.include_tare)
+            co2 += trips * get_co2_roundtrip(distance, c.demand / trips, vehicle, self.include_tare, self.include_build)
         return co2
 
 if __name__ == '__main__':

@@ -16,11 +16,14 @@ class Problem2(Problem):
         - truck capacity = CAPACITY of the instance file (not CAPACITIES["truck"] = 21 t of the base case)
         - CO2 of each arc computed with get_co2 (same formula as scenario 1):
           load carried on the arc + empty truck weight (if include_tare)
+          + building emissions of the truck spread over its lifespan in km (if include_build)
     """
 
-    def __init__(self, instance, include_tare=True):
-        super().__init__(instance)
-        self.include_tare = include_tare
+    def __init__(self,
+                 instance,
+                 include_tare,
+                 include_build):
+        super().__init__(instance, include_tare, include_build)
 
     def compute_distance_matrix(self):
         # distance matrix (km) between depot (0) and clients (1..n)
@@ -41,10 +44,15 @@ class Problem2(Problem):
 
             # CO2 (g) of each arc, split in the two parts of get_co2:
             # - load_emissions[i, j]: g of CO2 per tonne of goods carried on arc (i, j)
-            # - tare_emissions[i, j]: g of CO2 of driving the (empty) truck on arc (i, j), 0 if include_tare is False
-            load_emissions = {(i, j): get_co2(distance_matrix[i, j], 1000, "truck", include_tare=False)
+            # - tare_build_emissions[i, j]: g of CO2 of using arc (i, j) whatever the load:
+            #   empty truck weight (if include_tare) + building emissions per km (if include_build)
+            load_emissions = {(i, j): get_co2(distance_matrix[i, j], 1000, "truck",
+                                              include_tare=False,
+                                              include_build=False)
                          for i in node_labels for j in node_labels if i != j}
-            tare_emissions = {(i, j): get_co2(distance_matrix[i, j], 0, "truck", self.include_tare)
+            tare_build_emissions = {(i, j): get_co2(distance_matrix[i, j], 0, "truck",
+                                                    self.include_tare,
+                                                    self.include_build)
                          for i in node_labels for j in node_labels if i != j}
 
             ######## Define model #########
@@ -58,9 +66,9 @@ class Problem2(Problem):
 
             ######## Define objective #########
 
-            # total g of CO2 = goods transported + empty truck weight on every arc used
+            # total g of CO2 = goods transported + (empty truck weight + building emissions) on every arc used
             m.setObjective(gp.quicksum(load_emissions[i, j] * q[i, j]
-                                       + tare_emissions[i, j] * a[i, j] for i, j in load_emissions),
+                                       + tare_build_emissions[i, j] * a[i, j] for i, j in load_emissions),
                            GRB.MINIMIZE)
 
             ######## Define constraints #########

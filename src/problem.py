@@ -14,9 +14,15 @@ class Problem:
     by this class is in kilometres.
     """
 
-    def __init__(self, instance):
+    def __init__(self,
+                 instance,
+                 include_tare,
+                 include_build):
         self.instance = instance
         dimension, capacity, demand, coordinates = get_data(instance)
+
+        self.include_tare = include_tare
+        self.include_build = include_build
 
         # point 0 of the file is the depot, the rest are clients
         self.depot = coordinates[0]
