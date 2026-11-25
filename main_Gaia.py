@@ -17,8 +17,8 @@ def pipeline_gurobi_scenario1_comparison(gurobi_time_limit,
     instances_not_solved = []
     dimensions_not_solved = []
     for i in range(5, 6):
-        p1 = Problem1(instance=i)
-        p2 = Problem2(instance=i)
+        p1 = Problem1(instance=i, include_tare=True, include_build=False)
+        p2 = Problem2(instance=i, include_tare=True, include_build=True)
 
         time_start = time.time()
 
@@ -65,12 +65,15 @@ def pipeline_gurobi_scenario1_comparison(gurobi_time_limit,
         errors_df.to_csv(f'{results_dir}/problem2_errors_gurobi_{gurobi_time_limit}.csv', index=False)
 
 if __name__ == '__main__':
-    instances = [13]
     test_mode = True # Set to True to save results locally, False to save in the shared "results" folder
     results_dir = RESULTS_FOLDERS["local"] if test_mode else RESULTS_FOLDERS["shared"]
 
+    pipeline_gurobi_scenario1_comparison(gurobi_time_limit=30,
+                                         results_dir=results_dir)
+
+    instances = [13]
     for instance in instances:
-        p2 = Problem2(instance=instance)
+        p2 = Problem2(instance=instance, include_tare=True, include_build=True)
         
         p2.solve_gurobi(time_limit=60, test_mode=test_mode)
         p2.plot_trips_scenario2(solution_method="Gurobi",

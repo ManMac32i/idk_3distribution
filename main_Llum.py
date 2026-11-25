@@ -4,7 +4,7 @@ if __name__ == '__main__':
     print("Scenario 1 (Drive): CO2 in kg, with and without vehicle tare")
     print(f"{'Inst':>4} {'Clients':>8} {'Demand (kg)':>12} {'CO2 w/ tare':>12} {'CO2 w/o tare':>14}")
     for i in range(1, 13):
-        p = Problem1(i)
+        p = Problem1(i, include_tare=True, include_build=False)
         with_tare = p.calculate_co2()
         p.include_tare = False
         goods_only = p.calculate_co2()

@@ -1,5 +1,5 @@
 # transport emissions in g of CO2 per tonne per km
-EMISIONS = {
+ROUTING_EMISSIONS = {
     "truck": 311,
     "car": 772,
     "bike": 0
@@ -34,6 +34,12 @@ VEHICLE_WEIGHTS = {
     "car": 2000,
     "bike": 20
     }
+
+# vehicle lifespan in km
+# Todo: check values!!
+VEHICLE_LIFESPAN = {
+    "truck": 1000000
+}
 
 RESULTS_FOLDERS = {"shared": "results",
                    "local": "local_results"}
